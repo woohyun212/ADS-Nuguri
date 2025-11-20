@@ -14,6 +14,7 @@
 
 - <꼬리말> (선택사항)
 ```
+한글을 사용해도 좋습니다.
 
 #### 타입 (Type)
 - **feat**: 새로운 기능 추가
@@ -57,7 +58,8 @@ feat: 이진 탐색 트리 구현
   ```
 - **구조체명**: PascalCase 사용
   ```c
-  typedef struct Node {
+  typedef struct Node 
+  {
       int data;
       struct Node* next;
   } Node;
@@ -65,7 +67,7 @@ feat: 이진 탐색 트리 구현
 
 #### 들여쓰기 및 포맷팅
 - 들여쓰기: 4칸 스페이스 사용
-- 중괄호 스타일: K&R 스타일
+- 중괄호 스타일: BSD 스타일
   ```c
   if (condition) {
       // code
@@ -78,7 +80,8 @@ feat: 이진 탐색 트리 구현
 - 함수 상단에 간단한 설명 주석 작성
   ```c
   // 노드를 삽입하는 함수
-  void insert_node(Node* root, int value) {
+  void insert_node(Node* root, int value) 
+  {
       // implementation
   }
   ```
