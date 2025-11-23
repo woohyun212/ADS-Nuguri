@@ -57,6 +57,7 @@ void move_player(char input);
 void move_enemies();
 void check_collisions();
 int kbhit();
+void textcolor(int color);
 
 int main()
 {
@@ -393,4 +394,32 @@ int kbhit()
         return 1;
     }
     return 0;
+}
+
+void textcolor(int color)
+{
+    // 색깔바꾸기
+    if(color<20){
+        printf("\033[%dm", color + 30); //텍스트의 전경색 계산
+    }else{
+        printf("\033[%dm", color + 70); //텍스트의 밝은 전경색 계산
+    }
+    // Black	30	40
+    // Red	    31	41
+    // Green	32	42
+    // Yellow	33	43
+    // Blue	    34	44
+    // Magenta	35	45
+    // Cyan	    36	46
+    // White	37	47
+    // Default	39	49
+
+    // Bright Black	90	100
+    // Bright Red	91	101
+    // Bright Green	92	102
+    // Bright Yellow93	103
+    // Bright Blue	94	104
+    // Bright Magenta   95	105
+    // Bright Cyan	96	106
+    // Bright White	97	107
 }
