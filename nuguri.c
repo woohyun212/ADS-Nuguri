@@ -12,6 +12,7 @@
 #define MAX_STAGES 2
 #define MAX_ENEMIES 15 // 최대 적 개수 증가
 #define MAX_COINS 30   // 최대 코인 개수 증가
+#define MAX_HEALTH 3  // 최대 체력
 
 // 구조체 정의
 typedef struct
@@ -36,6 +37,7 @@ int score = 0;
 int is_jumping = 0;
 int velocity_y = 0;
 int on_ladder = 0;
+int health = 3;
 
 // 게임 객체
 Enemy enemies[MAX_ENEMIES];
@@ -58,6 +60,8 @@ void move_enemies();
 void check_collisions();
 int kbhit();
 void textcolor(int color);
+void health_system();
+void draw_health();
 
 int main()
 {
@@ -206,6 +210,7 @@ void draw_game()
     printf("\x1b[2J\x1b[H");
     printf("Stage: %d | Score: %d\n", stage + 1, score);
     printf("조작: ← → (이동), ↑ ↓ (사다리), Space (점프), q (종료)\n");
+    draw_health(); //체력 표시 함수 호출
 
     char display_map[MAP_HEIGHT][MAP_WIDTH + 1];
     for (int y = 0; y < MAP_HEIGHT; y++)
@@ -359,6 +364,7 @@ void check_collisions()
         if (player_x == enemies[i].x && player_y == enemies[i].y)
         {
             score = (score > 50) ? score - 50 : 0;
+            health_system(); //적과 충돌 시 생명력 감소
             init_stage();
             return;
         }
@@ -422,4 +428,32 @@ void textcolor(int color)
     // Bright Magenta   95	105
     // Bright Cyan	96	106
     // Bright White	97	107
+}
+
+//체력을 감소 시키고 게임 오버 여부 확인
+void health_system()
+{
+    health--;
+    if(health <= 0) //체력 소진 시 게임 오버
+    { 
+        printf("Game Over\n");
+        exit(0);
+    }
+}
+
+//현재 체력 상태를 하트 기호로 출력
+void draw_health()
+{
+    for(int i = 0; i < health; i++) //남은 체력만큼 하트 출력
+    { 
+        textcolor(11);
+        printf("♥");
+    }
+    for(int i = 0; i < MAX_HEALTH-health; i++) //깎인 체력만큼 빈 하트 출력
+    { 
+        textcolor(11);
+        printf("♡");
+    }
+    printf("\n");
+    textcolor(39);
 }
