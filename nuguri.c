@@ -71,10 +71,14 @@ void health_system();
 void draw_health();
 void opening(void);
 void ending(void);
+void cls_screen(void);
+void void_screen();
 
 int main()
 {
+    void_screen();
     opening();
+    void_screen();
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
     enable_raw_mode();
@@ -130,7 +134,7 @@ int main()
             else
             {
                 game_over = 1;
-                printf("\x1b[2J\x1b[H");
+                cls_screen();
                 printf("축하합니다! 모든 스테이지를 클리어했습니다!\n");
                 printf("최종 점수: %d\n", score);
             }
@@ -354,7 +358,7 @@ void init_stage()
 void draw_game()
 {
     Stage* st = &stages[stage];
-    printf("\x1b[2J\x1b[H");
+    cls_screen();
     printf("Stage: %d/%d | Score: %d\n", stage + 1, stage_count, score);
     printf("조작: ← → (이동), ↑ ↓ (사다리), Space (점프), q (종료)\n");
     draw_health(); //체력 표시 함수 호출
@@ -409,7 +413,29 @@ void draw_game()
     {
         for (int x = 0; x < st->width; x++)
         {
+            switch (display_map[y][x])
+            {
+                case '#':
+                    textcolor(8); //회색
+                    break;
+                case 'H':
+                    textcolor(6); //청록색
+                    break;
+                case 'C':
+                    textcolor(3); //노란색
+                    break;
+                case 'X':
+                    textcolor(1); //빨간색
+                    break;
+                case 'P':
+                    textcolor(2); //초록색
+                    break;
+                default:
+                    textcolor(9); //기본색
+                    break;
+            }
             printf("%c", display_map[y][x]);
+            textcolor(9);
         }
         printf("\n");
         free(display_map[y]);
@@ -636,7 +662,7 @@ void draw_health()
 
 void opening(void)
 {
-    printf("\x1b[2J\x1b[H"); // 화면 지우기
+    cls_screen(); // 화면 지우기
     usleep(200000);
 
     const char* frames[] = {
@@ -717,7 +743,7 @@ void opening(void)
         "        / >🍒\t/ >🍒\t/ >🍒\t/ >🍒\t/ >🍒  \n",
 
         " \n"
-        " \n"
+        "                                                              \n"
         "     ███╗   ██╗██╗   ██╗ ██████╗ ██╗   ██╗ ██████╗ ██████╗ ██╗\n"
         "     ████╗  ██║██║   ██║██╔════╝ ██║   ██║██╔═══██╗██╔══██╗██║\n"
         "     ██╔██╗ ██║██║   ██║██║  ███╗██║   ██║██║   ██║██████╔╝██║\n"
@@ -743,7 +769,7 @@ void opening(void)
 
     for (int i = 0; i < frame_count; i++)
     {
-        printf("\x1b[2J\x1b[H");
+        cls_screen();
         printf("%s\n", frames[i]);
         usleep(500000);
     }
@@ -808,7 +834,7 @@ void ending(void)
     // while 문으로 교체
     int i = 0;
     while (1) {
-        printf("\x1b[2J\x1b[H");  // 화면 클
+        cls_screen();  // 화면 클
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
         printf("\n종료하려면 아무키나 입력...\n");
@@ -820,4 +846,16 @@ void ending(void)
             break;
         }
     }
+}
+
+void void_screen()
+{
+    // 전체 화면을 지우고 커서를 0,0으로 이동
+    printf("\x1b[2J\x1b[H");
+}
+
+void cls_screen(void)
+{
+    // 커서만 0,0 으로 이동
+    printf("\x1b[H");
 }
