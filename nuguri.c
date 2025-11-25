@@ -612,24 +612,24 @@ void textcolor(int color)
     {
         printf("\033[%dm", color + 70); //텍스트의 밝은 전경색 계산
     }
-    // Black	30	40
-    // Red	    31	41
-    // Green	32	42
-    // Yellow	33	43
-    // Blue	    34	44
-    // Magenta	35	45
-    // Cyan	    36	46
-    // White	37	47
-    // Default	39	49
+    // Black	0	10
+    // Red	    1	11
+    // Green	2	12
+    // Yellow	3	13
+    // Blue	    4	14
+    // Magenta	5	15
+    // Cyan	    6	16
+    // White	7	17
+    // Default	9	19
 
-    // Bright Black	90	100
-    // Bright Red	91	101
-    // Bright Green	92	102
-    // Bright Yellow93	103
-    // Bright Blue	94	104
-    // Bright Magenta   95	105
-    // Bright Cyan	96	106
-    // Bright White	97	107
+    // Bright Black	20	30
+    // Bright Red	21	31
+    // Bright Green	22	32
+    // Bright Yellow23	33
+    // Bright Blue	24	34
+    // Bright Magenta   25	35
+    // Bright Cyan	26	36
+    // Bright White	27	37
 }
 
 //체력을 감소 시키고 게임 오버 여부 확인
