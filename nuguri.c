@@ -74,6 +74,7 @@ void ending(void);
 
 int main()
 {
+    opening();
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
     enable_raw_mode();
@@ -810,7 +811,7 @@ void ending(void)
         printf("\x1b[2J\x1b[H");  // 화면 클
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
-        printf("\n종료하려면 엔터...\n");
+        printf("\n종료하려면 아무키나 입력...\n");
         usleep(500000);
         i = (i + 1) % (count-1);  // 프레임 순환
         // 엔터 키 입력 시 종료
