@@ -413,18 +413,27 @@ void draw_game()
     {
         for (int x = 0; x < st->width; x++)
         {
-            if (display_map[y][x] == '#')
-                textcolor(8); //회색
-            else if (display_map[y][x] == 'H')
-                textcolor(6); //청록색
-            else if (display_map[y][x] == 'C')
-                textcolor(3); //노란색
-            else if (display_map[y][x] == 'X')
-                textcolor(1); //빨간색
-            else if (display_map[y][x] == 'P')
-                textcolor(2); //초록색
-            else
-                textcolor(9); //기본색
+            switch (display_map[y][x])
+            {
+                case '#':
+                    textcolor(8); //회색
+                    break;
+                case 'H':
+                    textcolor(6); //청록색
+                    break;
+                case 'C':
+                    textcolor(3); //노란색
+                    break;
+                case 'X':
+                    textcolor(1); //빨간색
+                    break;
+                case 'P':
+                    textcolor(2); //초록색
+                    break;
+                default:
+                    textcolor(9); //기본색
+                    break;
+            }
             printf("%c", display_map[y][x]);
             textcolor(9);
         }
