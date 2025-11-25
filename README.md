@@ -69,7 +69,8 @@ feat: 이진 탐색 트리 구현
 - 들여쓰기: 4칸 스페이스 사용
 - 중괄호 스타일: BSD 스타일
   ```c
-  if (condition) {
+  if (condition)
+  {
       // code
   } else {
       // code
