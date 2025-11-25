@@ -69,7 +69,6 @@ int kbhit();
 void textcolor(int color);
 void health_system();
 void draw_health();
-void textcolor(int color);
 void opening(void);
 void ending(void);
 
