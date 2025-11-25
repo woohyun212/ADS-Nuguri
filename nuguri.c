@@ -446,14 +446,14 @@ void draw_health()
 {
     for(int i = 0; i < health; i++) //남은 체력만큼 하트 출력
     { 
-        textcolor(11);
-        printf("♥");
+        textcolor(1);
+        printf("♥ ");
     }
     for(int i = 0; i < MAX_HEALTH-health; i++) //깎인 체력만큼 빈 하트 출력
     { 
-        textcolor(11);
-        printf("♡");
+        textcolor(1);
+        printf("♡ ");
     }
     printf("\n");
-    textcolor(39);
+    textcolor(9);
 }
