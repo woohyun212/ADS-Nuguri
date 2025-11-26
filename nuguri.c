@@ -62,7 +62,9 @@ int display_width = 0;
 int display_height = 0;
 
 // 터미널 설정
+#ifndef _WIN32
 struct termios orig_termios;
+#endif
 
 // 함수 선언
 void disable_raw_mode();
@@ -90,12 +92,17 @@ void delay(int ms);
 
 int main()
 {
+    #ifdef _WIN32
+        SetConsoleOutputCP(CP_UTF8);
+    #endif
     void_screen();
     opening();
     void_screen();
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
+    #ifndef _WIN32
     enable_raw_mode();
+    #endif
     atexit(cls_mem);
     load_maps();
     init_stage();
@@ -156,12 +163,15 @@ int main()
         }
     }
 
+    #ifndef _WIN32
     disable_raw_mode();
+    #endif
     return 0;
 }
 
 
 // 터미널 Raw 모드 활성화/비활성화
+#ifndef _WIN32
 void disable_raw_mode() { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
 
 void enable_raw_mode()
@@ -172,6 +182,7 @@ void enable_raw_mode()
     raw.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
+#endif
 
 // 임시로 모은 한 스테이지의 행들을 Stage 구조체로 묶어 stages 배열에 추가
 void append_stage(char** temp_lines, int temp_count, int max_width)
