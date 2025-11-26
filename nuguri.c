@@ -86,6 +86,7 @@ void cls_screen(void);
 void void_screen();
 void cls_mem();
 void beep();
+void delay(int ms);
 
 int main()
 {
