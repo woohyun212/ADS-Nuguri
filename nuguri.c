@@ -73,6 +73,7 @@ void opening(void);
 void ending(void);
 void cls_screen(void);
 void void_screen();
+void cls_mem();
 
 int main()
 {
@@ -82,6 +83,7 @@ int main()
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
     enable_raw_mode();
+    atexit(cls_mem);
     load_maps();
     init_stage();
 
@@ -284,6 +286,38 @@ void load_maps()
         fprintf(stderr, "map.txt에 유효한 스테이지가 없습니다.\n");
         exit(1);
     }
+}
+// 동적 할당한 stages, enemy, coins 객체들의 메모리를 해제하는 함수. atexit(cls_mem())처럼 사용
+void cls_mem()
+{
+    if (stages)
+    {
+        for (int i = 0; i < stage_count; i++)
+        {
+            if (stages[i].rows)
+            {
+                for (int y = 0; y < stages[i].height; y++)
+                {
+                    free(stages[i].rows[y]);
+                }
+                free(stages[i].rows);
+                stages[i].rows = NULL;
+            }
+        }
+        free(stages);
+        stages = NULL;
+    }
+    stage_count = 0;
+
+    free(enemies);
+    enemies = NULL;
+    enemy_count = 0;
+    enemy_capacity = 0;
+
+    free(coins);
+    coins = NULL;
+    coin_count = 0;
+    coin_capacity = 0;
 }
 
 
