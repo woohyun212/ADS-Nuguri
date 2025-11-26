@@ -689,8 +689,7 @@ void health_system()
     health--;
     if (health <= 0) //체력 소진 시 게임 오버
     {
-        printf("Game Over\n");
-        exit(0);
+        game_over();
     }
 }
 
