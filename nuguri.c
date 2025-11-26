@@ -459,7 +459,7 @@ void draw_game()
     {
         for (int x = 0; x < st->width; x++)
         {
-            char object_cell = display_row[y][x];
+            char object_cell = display_rows[y][x];
             char base_cell = st->rows[y][x];
             char map_cell = (base_cell == 'S' || base_cell == 'X' || base_cell == 'C') ? ' ' : base_cell;
             char cell = (object_cell != ' ') ? object_cell : map_cell;
