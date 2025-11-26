@@ -106,7 +106,7 @@ int main()
     {
         if (kbhit())
         {
-            c = getchar();
+            c = getch();
             if (c == 'q')
             {
                 game_over = 1;
@@ -114,8 +114,8 @@ int main()
             }
             if (c == '\x1b')
             {
-                getchar(); // '['
-                switch (getchar())
+                getch(); // '['
+                switch (getch())
                 {
                 case 'A': c = 'w';
                     break; // Up
@@ -636,24 +636,37 @@ void check_collisions()
 // 비동기 키보드 입력 확인
 int kbhit()
 {
-    struct termios oldt, newt;
-    int ch;
-    int oldf;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    fcntl(STDIN_FILENO, F_SETFL, oldf);
-    if (ch != EOF)
-    {
-        ungetc(ch, stdin);
-        return 1;
-    }
-    return 0;
+    #ifdef _WIN32
+        return _kbhit();
+    #else
+        struct termios oldt, newt;
+        int ch;
+        int oldf;
+        tcgetattr(STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+        ch = getchar();
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        fcntl(STDIN_FILENO, F_SETFL, oldf);
+        if (ch != EOF)
+        {
+            ungetc(ch, stdin);
+            return 1;
+        }
+        return 0;
+    #endif
+}
+
+int getch()
+{
+    #ifdef _WIN32
+        return _getch(); //엔터 키 없이 입력 반환
+    #else
+        return getchar();
+    #endif
 }
 
 void textcolor(int color)
