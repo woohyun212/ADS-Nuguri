@@ -50,6 +50,12 @@ Coin* coins = NULL; // 가변 길이 코인 배열
 int coin_count = 0;
 int coin_capacity = 0; // 현재 할당된 코인 배열 크기
 
+// 화면 버퍼 (스테이지 크기 변경 시에만 재할당)
+char** display_rows = NULL;
+char* display_buffer = NULL;
+int display_width = 0;
+int display_height = 0;
+
 // 터미널 설정
 struct termios orig_termios;
 
@@ -307,17 +313,25 @@ void cls_mem()
         free(stages);
         stages = NULL;
     }
-    stage_count = 0;
+    //stage_count = 0;
 
     free(enemies);
     enemies = NULL;
-    enemy_count = 0;
-    enemy_capacity = 0;
+    //enemy_count = 0;
+    //enemy_capacity = 0;
 
     free(coins);
     coins = NULL;
-    coin_count = 0;
-    coin_capacity = 0;
+    //coin_count = 0;
+    //coin_capacity = 0;
+
+    free(display_buffer);
+    display_buffer = NULL;
+    //display_width = 0;
+    //display_height = 0;
+
+    free(display_rows);
+    display_rows = NULL;
 }
 
 
@@ -330,6 +344,32 @@ void init_stage()
     velocity_y = 0;
 
     Stage* st = &stages[stage];
+
+    if (st->width != display_width || st->height != display_height)
+    {
+        free(display_buffer);
+        free(display_rows);
+
+        display_width = st->width;
+        display_height = st->height;
+
+        display_buffer = (char*)malloc(display_width * display_height);
+        display_rows = (char**)malloc(sizeof(char*) * display_height);
+        if (!display_buffer || !display_rows)
+        {
+            fprintf(stderr, "화면 버퍼 할당 실패\n");
+            exit(1);
+        }
+        for (int i = 0; i < display_height; i++)
+        {
+            display_rows[i] = display_buffer + (i * display_width);
+        }
+    }
+
+    if (display_buffer)
+    {
+        memset(display_buffer, ' ', display_width * display_height);
+    }
 
     for (int y = 0; y < st->height; y++)
     {
@@ -397,57 +437,33 @@ void draw_game()
     printf("조작: ← → (이동), ↑ ↓ (사다리), Space (점프), q (종료)\n");
     draw_health(); //체력 표시 함수 호출
 
-    // 동적 크기의 스테이지를 그리기 위해 매 프레임 임시 버퍼를 동적 할당해 사용 후 즉시 해제
-    char** display_map = (char**)malloc(sizeof(char*) * st->height);
-    if (!display_map)
-    {
-        fprintf(stderr, "화면 버퍼 할당 실패\n");
-        exit(1);
-    }
-
-    for (int y = 0; y < st->height; y++)
-    {
-        display_map[y] = (char*)malloc(st->width + 1);
-        if (!display_map[y])
-        {
-            fprintf(stderr, "화면 행 할당 실패\n");
-            exit(1);
-        }
-        for (int x = 0; x < st->width; x++)
-        {
-            char cell = st->rows[y][x];
-            if (cell == 'S' || cell == 'X' || cell == 'C')
-            {
-                display_map[y][x] = ' ';
-            }
-            else
-            {
-                display_map[y][x] = cell;
-            }
-        }
-        display_map[y][st->width] = '\0';
-    }
+    memset(display_buffer, ' ', display_width * display_height);
 
     for (int i = 0; i < coin_count; i++)
     {
         if (!coins[i].collected)
         {
-            display_map[coins[i].y][coins[i].x] = 'C';
+            display_rows[coins[i].y][coins[i].x] = 'C';
         }
     }
 
     for (int i = 0; i < enemy_count; i++)
     {
-        display_map[enemies[i].y][enemies[i].x] = 'X';
+        display_rows[enemies[i].y][enemies[i].x] = 'X';
     }
 
-    display_map[player_y][player_x] = 'P';
+    display_rows[player_y][player_x] = 'P';
 
     for (int y = 0; y < st->height; y++)
     {
         for (int x = 0; x < st->width; x++)
         {
-            switch (display_map[y][x])
+            char object_cell = display_row[y][x];
+            char base_cell = st->rows[y][x];
+            char map_cell = (base_cell == 'S' || base_cell == 'X' || base_cell == 'C') ? ' ' : base_cell;
+            char cell = (object_cell != ' ') ? object_cell : map_cell;
+            
+            switch (cell)
             {
                 case '#':
                     textcolor(8); //회색
@@ -468,13 +484,11 @@ void draw_game()
                     textcolor(9); //기본색
                     break;
             }
-            printf("%c", display_map[y][x]);
+            printf("%c", cell);
             textcolor(9);
         }
         printf("\n");
-        free(display_map[y]);
     }
-    free(display_map);
 }
 
 // 게임 상태 업데이트
