@@ -80,6 +80,7 @@ void ending(void);
 void cls_screen(void);
 void void_screen();
 void cls_mem();
+void beep();
 
 int main()
 {
@@ -622,6 +623,7 @@ void check_collisions()
         {
             coins[i].collected = 1;
             score += 20;
+            beep();
         }
     }
 }
@@ -906,4 +908,8 @@ void cls_screen(void)
 {
     // 커서만 0,0 으로 이동
     printf("\x1b[H");
+}
+
+void beep() {
+    printf("\a"); // 비프음 발생
 }
