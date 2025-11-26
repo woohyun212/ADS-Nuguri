@@ -2,9 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> // usleep
-#include <termios.h>
-#include <fcntl.h>
+#ifdef _WIN32
+    #include <windows.h> //Sleep
+    #include <conio.h> //kbhit, getch
+#else
+    #include <unistd.h> // usleep
+    #include <termios.h>
+    #include <fcntl.h>
+#endif
 #include <time.h>
 
 // 맵 및 게임 요소 정의 (동적 크기 지원)
@@ -130,7 +135,7 @@ int main()
 
         update_game(c);
         draw_game();
-        usleep(90000);
+        delay(90);
 
         if (stages[stage].rows[player_y][player_x] == 'E')
         {
@@ -713,7 +718,7 @@ void draw_health()
 void opening(void)
 {
     cls_screen(); // 화면 지우기
-    usleep(200000);
+    delay(200);
 
     const char* frames[] = {
         " \n"
@@ -821,7 +826,7 @@ void opening(void)
     {
         cls_screen();
         printf("%s\n", frames[i]);
-        usleep(500000);
+        delay(500);
     }
 
     printf("\n계속 진행하려면 엔터..\n");
@@ -888,7 +893,7 @@ void ending(void)
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
         printf("\n종료하려면 아무키나 입력...\n");
-        usleep(500000);
+        delay(500);
         i = (i + 1) % (count-1);  // 프레임 순환
         // 엔터 키 입력 시 종료
         if (kbhit())
@@ -910,6 +915,16 @@ void cls_screen(void)
     printf("\x1b[H");
 }
 
-void beep() {
+void beep()
+{
     printf("\a"); // 비프음 발생
+}
+
+void delay(int ms)
+{
+    #ifdef _WIN32
+        Sleep(ms);
+    #else
+        usleep(ms * 1000);
+    #endif
 }
