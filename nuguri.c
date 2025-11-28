@@ -90,6 +90,7 @@ void void_screen();
 void cls_mem();
 void beep();
 void delay(int ms);
+int getch();
 
 int main()
 {
