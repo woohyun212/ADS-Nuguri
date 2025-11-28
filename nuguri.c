@@ -674,6 +674,7 @@ void move_enemies()
 // 충돌 감지 로직
 void check_collisions()
 {
+    Stage* st = &stages[stage];
     for (int i = 0; i < enemy_count; i++)
     {
         if (player_x == enemies[i].x && player_y == enemies[i].y)
@@ -689,6 +690,7 @@ void check_collisions()
         if (!coins[i].collected && player_x == coins[i].x && player_y == coins[i].y)
         {
             coins[i].collected = 1;
+            st->rows[coins[i].y][coins[i].x] = ' ';
             score += 20;
             beep();
         }
