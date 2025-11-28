@@ -2,9 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> // usleep
-#include <termios.h>
-#include <fcntl.h>
+#ifdef _WIN32
+    #include <windows.h> //Sleep
+    #include <conio.h> //kbhit, getch
+#else
+    #include <unistd.h> // usleep
+    #include <termios.h>
+    #include <fcntl.h>
+#endif
 #include <time.h>
 
 // 맵 및 게임 요소 정의 (동적 크기 지원)
@@ -57,7 +62,9 @@ int display_width = 0;
 int display_height = 0;
 
 // 터미널 설정
+#ifndef _WIN32
 struct termios orig_termios;
+#endif
 
 // 함수 선언
 void disable_raw_mode();
@@ -77,19 +84,26 @@ void health_system();
 void draw_health();
 void opening(void);
 void ending(void);
+void game_over(void);
 void cls_screen(void);
 void void_screen();
 void cls_mem();
 void beep();
+void delay(int ms);
 
 int main()
 {
+    #ifdef _WIN32
+        SetConsoleOutputCP(CP_UTF8);
+    #endif
     void_screen();
     opening();
     void_screen();
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
+    #ifndef _WIN32
     enable_raw_mode();
+    #endif
     atexit(cls_mem);
     load_maps();
     init_stage();
@@ -101,7 +115,7 @@ int main()
     {
         if (kbhit())
         {
-            c = getchar();
+            c = getch();
             if (c == 'q')
             {
                 game_over = 1;
@@ -109,8 +123,8 @@ int main()
             }
             if (c == '\x1b')
             {
-                getchar(); // '['
-                switch (getchar())
+                getch(); // '['
+                switch (getch())
                 {
                 case 'A': c = 'w';
                     break; // Up
@@ -130,7 +144,7 @@ int main()
 
         update_game(c);
         draw_game();
-        usleep(90000);
+        delay(90);
 
         if (stages[stage].rows[player_y][player_x] == 'E')
         {
@@ -150,12 +164,15 @@ int main()
         }
     }
 
+    #ifndef _WIN32
     disable_raw_mode();
+    #endif
     return 0;
 }
 
 
 // 터미널 Raw 모드 활성화/비활성화
+#ifndef _WIN32
 void disable_raw_mode() { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
 
 void enable_raw_mode()
@@ -166,6 +183,7 @@ void enable_raw_mode()
     raw.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
+#endif
 
 // 임시로 모은 한 스테이지의 행들을 Stage 구조체로 묶어 stages 배열에 추가
 void append_stage(char** temp_lines, int temp_count, int max_width)
@@ -677,24 +695,37 @@ void check_collisions()
 // 비동기 키보드 입력 확인
 int kbhit()
 {
-    struct termios oldt, newt;
-    int ch;
-    int oldf;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    fcntl(STDIN_FILENO, F_SETFL, oldf);
-    if (ch != EOF)
-    {
-        ungetc(ch, stdin);
-        return 1;
-    }
-    return 0;
+    #ifdef _WIN32
+        return _kbhit();
+    #else
+        struct termios oldt, newt;
+        int ch;
+        int oldf;
+        tcgetattr(STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+        ch = getchar();
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        fcntl(STDIN_FILENO, F_SETFL, oldf);
+        if (ch != EOF)
+        {
+            ungetc(ch, stdin);
+            return 1;
+        }
+        return 0;
+    #endif
+}
+
+int getch()
+{
+    #ifdef _WIN32
+        return _getch(); //엔터 키 없이 입력 반환
+    #else
+        return getchar();
+    #endif
 }
 
 void textcolor(int color)
@@ -734,8 +765,7 @@ void health_system()
     health--;
     if (health <= 0) //체력 소진 시 게임 오버
     {
-        printf("Game Over\n");
-        exit(0);
+        game_over();
     }
 }
 
@@ -759,7 +789,7 @@ void draw_health()
 void opening(void)
 {
     cls_screen(); // 화면 지우기
-    usleep(200000);
+    delay(200);
 
     const char* frames[] = {
         " \n"
@@ -867,7 +897,7 @@ void opening(void)
     {
         cls_screen();
         printf("%s\n", frames[i]);
-        usleep(500000);
+        delay(500);
     }
 
     printf("\n계속 진행하려면 엔터..\n");
@@ -934,7 +964,7 @@ void ending(void)
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
         printf("\n종료하려면 아무키나 입력...\n");
-        usleep(500000);
+        delay(500);
         i = (i + 1) % (count-1);  // 프레임 순환
         // 엔터 키 입력 시 종료
         if (kbhit())
@@ -942,6 +972,54 @@ void ending(void)
             break;
         }
     }
+}
+
+void game_over(void)
+{
+    const char* frames[] = {
+        "\n\n"
+        "        (\\_/)\t  (\\_/)\n"
+        "       ( T_T )\t ( T_T )\n"
+        "        / >💧\t / >💧 \n",
+        "\n\n"
+        "        (\\_/)\t  (\\_/)\n"
+        "       ( T^T )\t ( T^T )\n"
+        "        /💧<\\\t  /💧<\\\n",
+        "\n\n"
+        "        (\\_/)\t  (\\_/)\n"
+        "       ( T_T )\t ( T_T )\n"
+        "        / >💧\t / >💧 \n",
+        "\n\n"
+        "        (\\_/)\t  (\\_/)\n"
+        "       ( T^T )\t ( T^T )\n"
+        "        /💧<\\\t  /💧<\\\n",
+        
+        "\n\n"
+        "    ██████╗  █████╗ ███╗   ███╗███████╗\n"
+        "   ██╔════╝ ██╔══██╗████╗ ████║██╔════╝\n"
+        "   ██║  ███╗███████║██╔████╔██║█████╗  \n"
+        "   ██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  \n"
+        "   ╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗\n"
+        "    ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝\n"
+        "    ██████╗ ██╗   ██╗███████╗██████╗ \n"
+        "   ██╔═══██╗██║   ██║██╔════╝██╔══██╗\n"
+        "   ██║   ██║██║   ██║█████╗  ██████╔╝\n"
+        "   ██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗\n"
+        "   ╚██████╔╝ ╚████╔╝ ███████╗██║  ██║\n"
+        "    ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝\n"
+        "\n"
+        "            --- E X I T ---            \n"
+    };
+
+    int frame_count = sizeof(frames) / sizeof(frames[0]);
+
+    for (int i = 0; i < frame_count; i++)
+    {
+        cls_screen();
+        printf("%s\n", frames[i]);
+        usleep(500000);
+    }
+    exit(0);
 }
 
 void void_screen()
@@ -956,6 +1034,16 @@ void cls_screen(void)
     printf("\x1b[H");
 }
 
-void beep() {
+void beep()
+{
     printf("\a"); // 비프음 발생
+}
+
+void delay(int ms)
+{
+    #ifdef _WIN32
+        Sleep(ms);
+    #else
+        usleep(ms * 1000);
+    #endif
 }
