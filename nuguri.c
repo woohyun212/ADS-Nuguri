@@ -518,86 +518,132 @@ void update_game(char input)
     check_collisions();
 }
 
-// 플레이어 이동 로직
+// 플레이어 이동 로직 전반적인 수정
 void move_player(char input)
 {
-    Stage* st = &stages[stage]; // 현재 스테이지의 동적 폭/높이/지면을 참조
-    int next_x = player_x, next_y = player_y;
-    char floor_tile = (player_y + 1 < st->height) ? st->rows[player_y + 1][player_x] : '#'; // 맵 아래면 낙하 처리 (동적 높이)
-    char current_tile = st->rows[player_y][player_x];
+    Stage* st = &stages[stage];
+    char floor_tile = 0;
+    char current_tile = 0;
+    int next_x = player_x;
 
-    on_ladder = (current_tile == 'H');
-
+    // 수평 이동 처리
     switch (input)
     {
-    case 'a': next_x--;
-        break;
-    case 'd': next_x++;
-        break;
-    case 'w': if (on_ladder) next_y--;
-        break;
-    case 's': if (on_ladder && (player_y + 1 < st->height) && st->rows[player_y + 1][player_x] != '#') next_y++;
-        break;
-    case ' ':
-        if (!is_jumping && (floor_tile == '#' || on_ladder))
+        case 'a': next_x--; break;
+        case 'd': next_x++; break;
+    }
+    
+    if (next_x >= 0 && next_x < st->width && st->rows[player_y][next_x] != '#')
+    {
+        player_x = next_x;
+    }
+
+    // 현재 위치 정보 갱신
+    floor_tile = (player_y + 1 < st->height) ? st->rows[player_y + 1][player_x] : '#';
+    current_tile = st->rows[player_y][player_x];
+    
+    // 사다리 판정 갱신
+    on_ladder = (current_tile == 'H');
+
+    // 사다리 끝(위가 '#')에서 점프 시 천장 위로 올라감.
+    if (input == ' ' && !is_jumping) 
+    {
+        int climbed = 0;
+        if (on_ladder && player_y > 0 && st->rows[player_y - 1][player_x] == '#')
+        {
+            int climb_y = player_y - 1;
+            while (climb_y >= 0 && st->rows[climb_y][player_x] == '#') climb_y--;
+            if (climb_y >= 0 && st->rows[climb_y][player_x] != '#')
+            {
+                player_y = climb_y;
+                floor_tile = (player_y + 1 < st->height) ? st->rows[player_y + 1][player_x] : '#';
+                current_tile = st->rows[player_y][player_x];
+                on_ladder = (current_tile == 'H');
+                climbed = 1;
+            }
+        }
+
+        // 사다리에 붙어 있거나 바닥 위면 점프. 단, 방금 천장 위로 올라섰을 때는 점프 생략.
+        if (!climbed && (floor_tile == '#' || on_ladder)) 
         {
             is_jumping = 1;
             velocity_y = -2;
         }
-        break;
     }
 
-    // 동적 폭 기준으로 좌우 이동 가능 여부 확인
-    if (next_x >= 0 && next_x < st->width && st->rows[player_y][next_x] != '#') player_x = next_x;
-
-    if (on_ladder && (input == 'w' || input == 's'))
+    // 사다리 이동 처리 (점프 중이 아닐 때만 고정)
+    // (!is_jumping) 조건을 추가하여 점프 중일 때는 사다리 로직 무시
+    if (on_ladder && !is_jumping)
     {
-        // 동적 높이 기준으로 사다리 이동 처리
-        if (next_y >= 0 && next_y < st->height && st->rows[next_y][player_x] != '#')
+        velocity_y = 0; // 중력 무시
+        if (input == 'w') 
         {
-            player_y = next_y;
-            is_jumping = 0;
-            velocity_y = 0;
+            if (player_y - 1 >= 0 && st->rows[player_y - 1][player_x] != '#')
+                player_y--;
+        }
+        else if (input == 's')
+        {
+            if (player_y + 1 < st->height && st->rows[player_y + 1][player_x] != '#')
+                player_y++;
         }
     }
-    else
+    else 
     {
+        // 지상/공중 물리 처리 (중력 및 점프)
+        
+        // 걷다가 낭떠러지로 떨어진 경우 (점프도 아니고 사다리도 아님)
+        if (!is_jumping && floor_tile == ' ' && !on_ladder)
+        {
+            is_jumping = 1;
+            velocity_y = 1; // 낙하 시작
+        }
+
         if (is_jumping)
         {
-            next_y = player_y + velocity_y;
-            if (next_y < 0) next_y = 0;
-            velocity_y++;
+            int steps = abs(velocity_y); 
+            int dir = (velocity_y > 0) ? 1 : -1; 
 
-            // 위로 이동 시 천장을 만나면 속도 초기화
-            if (velocity_y < 0 && next_y < st->height && st->rows[next_y][player_x] == '#')
+            for (int i = 0; i < steps; i++)
             {
-                velocity_y = 0;
-            }
-            else if (next_y < st->height)
-            {
-                player_y = next_y;
+                int test_y = player_y + dir;
+
+                // 맵 범위 체크
+                if (test_y < 0 || test_y >= st->height)
+                {
+                    if (test_y >= st->height) init_stage();
+                    velocity_y = 0;
+                    break;
+                }
+
+                char target_cell = st->rows[test_y][player_x];
+
+                // 벽 충돌 체크
+                if (target_cell == '#')
+                {
+                    velocity_y = 0;
+                    if (dir == 1) // 바닥 착지
+                    {
+                        is_jumping = 0;
+                    }
+                    break; 
+                }
+                
+                // 이동 확정
+                player_y = test_y;
             }
 
-            if ((player_y + 1 < st->height) && st->rows[player_y + 1][player_x] == '#')
+            // 중력 적용
+            if (is_jumping) 
             {
-                is_jumping = 0;
-                velocity_y = 0;
-            }
-        }
-        else
-        {
-            if (floor_tile != '#' && floor_tile != 'H')
-            {
-                if (player_y + 1 < st->height) player_y++;
-                else init_stage();
+                velocity_y++;
+                if(velocity_y > 3) velocity_y = 3;
             }
         }
     }
 
-    // 동적 높이 기준으로 맵 밖 추락 시 스테이지 리셋
+    // 맵 밖으로 나갔는지 최종 확인
     if (player_y >= st->height) init_stage();
 }
-
 
 // 적 이동 로직
 void move_enemies()
