@@ -87,6 +87,7 @@ void ending(void);
 void game_over(void);
 void cls_screen(void);
 void void_screen();
+void hide_cursor(void);
 void cls_mem();
 void beep();
 void delay(int ms);
@@ -98,6 +99,7 @@ int main()
         SetConsoleOutputCP(CP_UTF8);
     #endif
     void_screen();
+    hide_cursor();
     opening();
     void_screen();
     srand(time(NULL));
@@ -1033,6 +1035,12 @@ void cls_screen(void)
 {
     // 커서만 0,0 으로 이동
     printf("\x1b[H");
+}
+
+void hide_cursor(void)
+{
+    //커서 숨기기
+    printf("\x1b[?25l");
 }
 
 void beep()
