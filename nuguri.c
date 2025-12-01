@@ -1,4 +1,3 @@
-#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -144,6 +143,9 @@ int main()
         {
             c = '\0';
         }
+
+        // 남은 입력을 즉시 비워 입력 버퍼가 쌓이는 것을 방지
+        while (kbhit()) { getch(); }
 
         update_game(c);
         draw_game();
