@@ -118,6 +118,24 @@ int main()
     {
         if (kbhit())
         {
+            #ifdef _WIN32
+            // Windows에서 방향키는 0xE0 + 키코드로 입력됨
+            if (c == 0xE0)
+            {
+                c = getch();
+                switch (c)
+                {
+                case 72: c = 'w'; // Up
+                    break;
+                case 80: c = 's'; // Down
+                    break;
+                case 77: c = 'd'; // Right
+                    break;
+                case 75: c = 'a'; // Left
+                    break;
+                }
+            }
+            #else
             c = getch();
             if (c == 'q')
             {
@@ -139,6 +157,8 @@ int main()
                     break; // Left
                 }
             }
+            #endif
+        // 비-Windows 환경에서 방향키는 ESC 시퀀스로 입력됨
         }
         else
         {
