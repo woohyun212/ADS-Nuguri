@@ -777,6 +777,7 @@ void health_system()
     health--;
     if (health <= 0) //체력 소진 시 게임 오버
     {
+        void_screen();
         game_over();
     }
 }
@@ -1027,7 +1028,7 @@ void game_over(void)
 
     for (int i = 0; i < frame_count; i++)
     {
-        void_screen();
+        cls_screen();
         printf("%s\n", frames[i]);
         delay(500);
     }
