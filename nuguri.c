@@ -150,7 +150,7 @@ int main()
 
         update_game(c);
         draw_game();
-        delay(90);
+        delay(30);
 
         if (stages[stage].rows[player_y][player_x] == 'E')
         {
