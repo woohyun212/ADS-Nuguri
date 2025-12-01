@@ -78,6 +78,7 @@ void update_game(char input);
 void move_player(char input);
 void move_enemies();
 void check_collisions();
+void check_coin(int x, int y);
 int kbhit();
 void textcolor(int color);
 void health_system();
@@ -527,6 +528,20 @@ void update_game(char input)
     check_collisions();
 }
 
+// 이동 시 호출하여 플레이어 위치와 코인 간 충돌을 확인하는 함수
+void check_coin(int x, int y)
+{
+    for (int i = 0; i < coin_count; i++)
+    {
+        if (!coins[i].collected && coins[i].x == x && coins[i].y == y)
+        {
+            coins[i].collected = 1;
+            score += 20;
+            beep();
+        }
+    }
+}
+
 // 플레이어 이동 로직 전반적인 수정
 void move_player(char input)
 {
@@ -546,6 +561,7 @@ void move_player(char input)
     {
         player_x = next_x;
     }
+    check_coin(player_x, player_y);
 
     // 현재 위치 정보 갱신
     floor_tile = (player_y + 1 < st->height) ? st->rows[player_y + 1][player_x] : '#';
@@ -588,12 +604,18 @@ void move_player(char input)
         if (input == 'w') 
         {
             if (player_y - 1 >= 0 && st->rows[player_y - 1][player_x] != '#')
+            {
                 player_y--;
+                check_coin(player_x, player_y);
+            }
         }
         else if (input == 's')
         {
             if (player_y + 1 < st->height && st->rows[player_y + 1][player_x] != '#')
+            {
                 player_y++;
+                check_coin(player_x, player_y);
+            }
         }
     }
     else 
@@ -639,6 +661,7 @@ void move_player(char input)
                 
                 // 이동 확정
                 player_y = test_y;
+                check_coin(player_x, player_y);
             }
 
             // 중력 적용
