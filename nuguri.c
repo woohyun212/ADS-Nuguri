@@ -88,6 +88,7 @@ void game_over(void);
 void cls_screen(void);
 void void_screen();
 void hide_cursor(void);
+void show_cursor(void);
 void cls_mem();
 void beep();
 void delay(int ms);
@@ -107,6 +108,7 @@ int main()
     #ifndef _WIN32
     enable_raw_mode();
     #endif
+    atexit(show_cursor);
     atexit(cls_mem);
     load_maps();
     init_stage();
@@ -1051,6 +1053,12 @@ void hide_cursor(void)
 {
     //커서 숨기기
     printf("\x1b[?25l");
+}
+
+void show_cursor(void)
+{
+    //커서 숨기기
+    printf("\x1b[?25h");
 }
 
 void beep()
