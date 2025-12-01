@@ -164,6 +164,7 @@ int main()
             {
                 game_over = 1;
                 cls_screen();
+                ending();
                 printf("축하합니다! 모든 스테이지를 클리어했습니다!\n");
                 printf("최종 점수: %d\n", score);
             }
@@ -971,7 +972,7 @@ void ending(void)
     // while 문으로 교체
     int i = 0;
     while (1) {
-        cls_screen();  // 화면 클
+        void_screen();  // 화면 클
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
         printf("\n종료하려면 아무키나 입력...\n");
@@ -1026,7 +1027,7 @@ void game_over(void)
 
     for (int i = 0; i < frame_count; i++)
     {
-        cls_screen();
+        void_screen();
         printf("%s\n", frames[i]);
         delay(500);
     }
