@@ -36,6 +36,7 @@ typedef struct
 Stage* stages = NULL; // map.txt에서 읽어 만든 스테이지 목록
 int stage_count = 0; // 실제로 로드된 스테이지 개수
 int player_x, player_y;
+int spawn_x, spawn_y; // 스테이지 내 출발 지점(S)
 int stage = 0;
 int score = 0;
 const int MAX_HEALTH = 3;
@@ -404,6 +405,8 @@ void init_stage()
             {
                 player_x = x;
                 player_y = y;
+                spawn_x = x; // S 위치 기록용(S는 한번 사용한 후에 stage에서 사라짐)
+                spawn_y = y;
             }
             else if (cell == 'X')
             {
@@ -682,7 +685,10 @@ void check_collisions()
         {
             score = (score > 50) ? score - 50 : 0;
             health_system(); //적과 충돌 시 생명력 감소
-            init_stage();
+            player_x = spawn_x; // 처음 위치로 플레이어 이동
+            player_y = spawn_y;
+            is_jumping = 0; // 이동 로직 초기화
+            velocity_y = 0;
             return;
         }
     }
