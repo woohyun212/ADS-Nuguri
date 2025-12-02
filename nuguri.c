@@ -114,13 +114,14 @@ int main()
     load_maps();
     init_stage();
 
-    char c = '\0';
+    int c = '\0';
     int game_over = 0;
 
     while (!game_over && stage < stage_count)
     {
         if (kbhit())
         {
+            c = getch();
             #ifdef _WIN32
             // Windows에서 방향키는 0xE0 + 키코드로 입력됨
             if (c == 0xE0)
@@ -573,7 +574,6 @@ void move_player(char input)
 {
     Stage* st = &stages[stage];
     char floor_tile = 0;
-    char below_floor = 0;
     char current_tile = 0;
     int next_x = player_x;
 
