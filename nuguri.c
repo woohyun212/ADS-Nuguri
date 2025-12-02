@@ -114,7 +114,7 @@ int main()
     load_maps();
     init_stage();
 
-    char c = '\0';
+    int c = '\0';
     int game_over = 0;
 
     while (!game_over && stage < stage_count)
@@ -573,7 +573,6 @@ void move_player(char input)
 {
     Stage* st = &stages[stage];
     char floor_tile = 0;
-    char below_floor = 0;
     char current_tile = 0;
     int next_x = player_x;
 
