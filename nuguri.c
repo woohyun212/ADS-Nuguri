@@ -153,7 +153,11 @@ int main()
 
         update_game(c);
         draw_game();
-        delay(90);
+        #ifdef _WIN32
+            delay(30); // 윈도우에서는 더 빠른 속도
+        #else
+            delay(90); // 다른 운영체제에서는 기존 속도
+        #endif
 
         if (stages[stage].rows[player_y][player_x] == 'E')
         {
