@@ -121,6 +121,7 @@ int main()
     {
         if (kbhit())
         {
+            c = getch();
             #ifdef _WIN32
             // Windows에서 방향키는 0xE0 + 키코드로 입력됨
             if (c == 0xE0)
