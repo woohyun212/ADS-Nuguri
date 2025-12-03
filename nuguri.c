@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
-    #include <windows.h> //Sleep
-    #include <conio.h> //kbhit, getch
+#include <windows.h> //Sleep
+#include <conio.h> //kbhit, getch
 #else
-    #include <unistd.h> // usleep
-    #include <termios.h>
-    #include <fcntl.h>
+#include <unistd.h> // usleep
+#include <termios.h>
+#include <fcntl.h>
 #endif
 #include <time.h>
 
@@ -100,18 +100,18 @@ int getch();
 
 int main()
 {
-    #ifdef _WIN32
-        SetConsoleOutputCP(CP_UTF8);
-    #endif
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
     void_screen();
     hide_cursor();
     opening();
     void_screen();
     srand(time(NULL));
     // 맵을 동적으로 읽어 stage_count와 stages를 세팅한 뒤 게임 루프 실행
-    #ifndef _WIN32
+#ifndef _WIN32
     enable_raw_mode();
-    #endif
+#endif
     atexit(show_cursor);
     atexit(cls_mem);
     load_maps();
@@ -125,7 +125,7 @@ int main()
         if (kbhit())
         {
             c = getch();
-            #ifdef _WIN32
+#ifdef _WIN32
             // Windows에서 방향키는 0xE0 + 키코드로 입력됨
             if (c == 0xE0)
             {
@@ -142,7 +142,7 @@ int main()
                     break;
                 }
             }
-            else if(c == 'q')
+            else if (c == 'q')
             {
                 game_over = 1;
                 continue;
@@ -169,8 +169,8 @@ int main()
                     break; // Left
                 }
             }
-            #endif
-        // 비-Windows 환경에서 방향키는 ESC 시퀀스로 입력됨
+#endif
+            // 비-Windows 환경에서 방향키는 ESC 시퀀스로 입력됨
         }
         else
         {
@@ -182,11 +182,11 @@ int main()
 
         update_game(c);
         draw_game();
-        #ifdef _WIN32
-            delay(30); // 윈도우에서는 더 빠른 속도
-        #else
-            delay(90); // 다른 운영체제에서는 기존 속도
-        #endif
+#ifdef _WIN32
+        delay(30); // 윈도우에서는 더 빠른 속도
+#else
+        delay(90); // 다른 운영체제에서는 기존 속도
+#endif
 
         if (stages[stage].rows[player_y][player_x] == 'E')
         {
@@ -207,9 +207,9 @@ int main()
         }
     }
 
-    #ifndef _WIN32
+#ifndef _WIN32
     disable_raw_mode();
-    #endif
+#endif
     return 0;
 }
 
@@ -355,6 +355,7 @@ void load_maps()
         exit(1);
     }
 }
+
 // 동적 할당한 stages, enemy, coins 객체들의 메모리를 해제하는 함수. atexit(cls_mem())처럼 사용
 void cls_mem()
 {
@@ -526,27 +527,27 @@ void draw_game()
             char base_cell = st->rows[y][x];
             char map_cell = (base_cell == 'S' || base_cell == 'X' || base_cell == 'C') ? ' ' : base_cell;
             char cell = (object_cell != ' ') ? object_cell : map_cell;
-            
+
             switch (cell)
             {
-                case '#':
-                    textcolor(8); //회색
-                    break;
-                case 'H':
-                    textcolor(6); //청록색
-                    break;
-                case 'C':
-                    textcolor(3); //노란색
-                    break;
-                case 'X':
-                    textcolor(1); //빨간색
-                    break;
-                case 'P':
-                    textcolor(2); //초록색
-                    break;
-                default:
-                    textcolor(9); //기본색
-                    break;
+            case '#':
+                textcolor(8); //회색
+                break;
+            case 'H':
+                textcolor(6); //청록색
+                break;
+            case 'C':
+                textcolor(3); //노란색
+                break;
+            case 'X':
+                textcolor(1); //빨간색
+                break;
+            case 'P':
+                textcolor(2); //초록색
+                break;
+            default:
+                textcolor(9); //기본색
+                break;
             }
             printf("%c", cell);
             textcolor(9);
@@ -588,10 +589,12 @@ void move_player(char input)
     // 수평 이동 처리
     switch (input)
     {
-        case 'a': next_x--; break;
-        case 'd': next_x++; break;
+    case 'a': next_x--;
+        break;
+    case 'd': next_x++;
+        break;
     }
-    
+
     if (next_x >= 0 && next_x < st->width && st->rows[player_y][next_x] != '#')
     {
         player_x = next_x;
@@ -601,7 +604,7 @@ void move_player(char input)
     // 현재 위치 정보 갱신
     floor_tile = (player_y + 1 < st->height) ? st->rows[player_y + 1][player_x] : '#';
     current_tile = st->rows[player_y][player_x];
-    
+
     // 바닥이 사다리이거나, 바닥이 벽이고 그 아래가 사다리면 내려가기 지원
     if (input == 's' && floor_tile == '#' && player_y + 2 < st->height && st->rows[player_y + 2][player_x] == 'H')
     {
@@ -613,7 +616,7 @@ void move_player(char input)
     on_ladder = (current_tile == 'H');
 
     // 사다리 끝(위가 '#')에서 점프 시 천장 위로 올라감.
-    if (input == ' ' && !is_jumping) 
+    if (input == ' ' && !is_jumping)
     {
         int climbed = 0;
         if (on_ladder && player_y > 0 && st->rows[player_y - 1][player_x] == '#')
@@ -631,7 +634,7 @@ void move_player(char input)
         }
 
         // 사다리에 붙어 있거나 바닥 위면 점프. 단, 방금 천장 위로 올라섰을 때는 점프 생략.
-        if (!climbed && (floor_tile == '#' || on_ladder)) 
+        if (!climbed && (floor_tile == '#' || on_ladder))
         {
             is_jumping = 1;
             velocity_y = -2;
@@ -643,7 +646,7 @@ void move_player(char input)
     if (on_ladder && !is_jumping)
     {
         velocity_y = 0; // 중력 무시
-        if (input == 'w') 
+        if (input == 'w')
         {
             if (player_y - 1 >= 0 && st->rows[player_y - 1][player_x] != '#')
             {
@@ -660,10 +663,10 @@ void move_player(char input)
             }
         }
     }
-    else 
+    else
     {
         // 지상/공중 물리 처리 (중력 및 점프)
-        
+
         // 걷다가 낭떠러지로 떨어진 경우 (점프도 아니고 사다리도 아님)
         if (!is_jumping && floor_tile == ' ' && !on_ladder)
         {
@@ -673,8 +676,8 @@ void move_player(char input)
 
         if (is_jumping)
         {
-            int steps = abs(velocity_y); 
-            int dir = (velocity_y > 0) ? 1 : -1; 
+            int steps = abs(velocity_y);
+            int dir = (velocity_y > 0) ? 1 : -1;
 
             for (int i = 0; i < steps; i++)
             {
@@ -698,19 +701,19 @@ void move_player(char input)
                     {
                         is_jumping = 0;
                     }
-                    break; 
+                    break;
                 }
-                
+
                 // 이동 확정
                 player_y = test_y;
                 check_coin(player_x, player_y);
             }
 
             // 중력 적용
-            if (is_jumping) 
+            if (is_jumping)
             {
                 velocity_y++;
-                if(velocity_y > 3) velocity_y = 3;
+                if (velocity_y > 3) velocity_y = 3;
             }
         }
     }
@@ -724,7 +727,7 @@ void move_enemies()
 {
     enemy_move_timer++;
     if (enemy_move_timer < 3) // 3 프레임당 1번 움직임
-    { 
+    {
         return;
     }
     else
@@ -782,37 +785,37 @@ void check_collisions()
 // 비동기 키보드 입력 확인
 int kbhit()
 {
-    #ifdef _WIN32
-        return _kbhit();
-    #else
-        struct termios oldt, newt;
-        int ch;
-        int oldf;
-        tcgetattr(STDIN_FILENO, &oldt);
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-        fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
-        ch = getchar();
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-        fcntl(STDIN_FILENO, F_SETFL, oldf);
-        if (ch != EOF)
-        {
-            ungetc(ch, stdin);
-            return 1;
-        }
-        return 0;
-    #endif
+#ifdef _WIN32
+    return _kbhit();
+#else
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+    if (ch != EOF)
+    {
+        ungetc(ch, stdin);
+        return 1;
+    }
+    return 0;
+#endif
 }
 
 int getch()
 {
-    #ifdef _WIN32
-        return _getch(); //엔터 키 없이 입력 반환
-    #else
-        return getchar();
-    #endif
+#ifdef _WIN32
+    return _getch(); //엔터 키 없이 입력 반환
+#else
+    return getchar();
+#endif
 }
 
 void textcolor(int color)
@@ -860,13 +863,13 @@ void health_system()
 //현재 체력 상태를 하트 기호로 출력
 void draw_health()
 {
-    for(int i = 0; i < health; i++) //남은 체력만큼 하트 출력
-    { 
+    for (int i = 0; i < health; i++) //남은 체력만큼 하트 출력
+    {
         textcolor(1);
         printf("♥ ");
     }
-    for(int i = 0; i < MAX_HEALTH-health; i++) //깎인 체력만큼 빈 하트 출력
-    { 
+    for (int i = 0; i < MAX_HEALTH - health; i++) //깎인 체력만큼 빈 하트 출력
+    {
         textcolor(1);
         printf("♡ ");
     }
@@ -995,45 +998,48 @@ void opening(void)
 void ending(void)
 {
     const char* frames[] = {
-        "\n\n"
-        "        (\\_/)\t  (\\_/)\n"
-        "       ( ^_^ )\t ( ^_^ )\n"
-        "        / >🍒\t / >🍒 \n",
+        "                            \n"
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "       ( ^_^ )    ( ^_^ )    \n"
+        "        / >🍒     / >🍒       \n",
 
-        "\n\n"
-        "        (\\_/)\t  (\\_/)\n"
-        "       ( ^o^ )\t ( ^o^ )\n"
-        "        / >🍒\t / >🍒 \n",
+        "                            \n"
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "       ( ^o^ )    ( ^o^ )    \n"
+        "        / >🍒     / >🍒       \n",
 
-        "\n"
-        "        (\\_/)\t  (\\_/)\n"
-        "      \\( ^o^ )/\t\\( ^o^ )/\n"
-        "        /  🍒\t /  🍒 \n"
-        "\n",
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "      \\( ^o^ )/  \\( ^o^ )/\n"
+        "        /  🍒     /  🍒       \n"
+        "                            \n",
 
-        "\n\n"
-        "        (\\_/)\t (\\_/)\n"
-        "       ( ^o^ )\t( ^o^ )\n"
-        "        / >🍒\t/ >🍒 \n",
+        "                            \n"
+        "                            \n"
+        "        (\\_/)     (\\_/)     \n"
+        "       ( ^o^ )    ( ^o^ )     \n"
+        "        / >🍒     / >🍒        \n",
 
-        "\n"
-        "        (\\_/)\t  (\\_/)\n"
-        "      \\( ^o^ )/\t\\( ^o^ )/\n"
-        "        /  🍒\t /  🍒 \n"
-        "\n",
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "      \\( ^o^ )/  \\( ^o^ )/\n"
+        "        /  🍒     /  🍒       \n"
+        "                            \n",
 
-        "                                                                                    \n"
-        "                                                                                    \n"
-        "        (\\_/)\t  (\\_/)\n"
-        "       ( ^o^ )\t ( ^o^ )\n"
-        "        / >🍒\t / >🍒 \n",
+        "                            \n"
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "       ( ^o^ )    ( ^o^ )    \n"
+        "        / >🍒     / >🍒      \n",
 
 
-        "                                                                                    \n"
-        "                                                                                    \n"
-        "        (\\_/)\t  (\\_/)\n"
-        "       ( -_- )\t ( -_- )\n"
-        "       <  🍒\\\t <  🍒\\\n",
+        "                            \n"
+        "                            \n"
+        "        (\\_/)      (\\_/)    \n"
+        "       ( -_- )    ( -_- )    \n"
+        "       <  🍒\\     <  🍒\\    \n",
 
         "\n\n"
         "     ███████╗███╗   ██╗██████╗ \n"
@@ -1054,10 +1060,10 @@ void ending(void)
     {
         cls_screen(); // 화면 클
         printf("%s\n", frames[count - 1]); // END
-        printf("%s\n", frames[i]);    // 애니메이션 프레임
+        printf("%s\n", frames[i]); // 애니메이션 프레임
         printf("\n종료하려면 아무키나 입력...\n");
         delay(500);
-        i = (i + 1) % (count-1);  // 프레임 순환
+        i = (i + 1) % (count - 1); // 프레임 순환
         // 엔터 키 입력 시 종료
         if (kbhit())
         {
@@ -1085,7 +1091,7 @@ void game_over(void)
         "        (\\_/)\t  (\\_/)\n"
         "       ( T^T )\t ( T^T )\n"
         "        /💧<\\\t  /💧<\\\n",
-        
+
         "\n\n"
         "    ██████╗  █████╗ ███╗   ███╗███████╗\n"
         "   ██╔════╝ ██╔══██╗████╗ ████║██╔════╝\n"
@@ -1141,15 +1147,15 @@ void show_cursor(void)
 // 비프음 발생
 void beep()
 {
-    printf("\a"); 
+    printf("\a");
 }
 
 //지정된 시간 동안 대기
 void delay(int ms)
 {
-    #ifdef _WIN32
-        Sleep(ms);
-    #else
-        usleep(ms * 1000);
-    #endif
+#ifdef _WIN32
+    Sleep(ms);
+#else
+    usleep(ms * 1000);
+#endif
 }
