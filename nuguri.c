@@ -601,12 +601,10 @@ void move_player(char input)
     current_tile = st->rows[player_y][player_x];
     
     // 바닥이 사다리이거나, 바닥이 벽이고 그 아래가 사다리면 내려가기 지원
-    if(input == 's' && st->rows[player_y + 2][player_x] == 'H' && floor_tile == '#'){
-        if (player_y + 2 < st->height && st->rows[player_y + 2][player_x] != '#')
-            {
-                player_y += 2;
-                check_coin(player_x, player_y);
-            }
+    if (input == 's' && floor_tile == '#' && player_y + 2 < st->height && st->rows[player_y + 2][player_x] == 'H')
+    {
+        player_y += 2;
+        check_coin(player_x, player_y);
     }
 
     // 사다리 판정 갱신
