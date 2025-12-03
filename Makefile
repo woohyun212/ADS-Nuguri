@@ -20,14 +20,27 @@ CFLAGS  := -std=c11 -Wall -Wextra
 LDFLAGS :=
 
 ifeq ($(HOST_OS),Windows)
-  TARGET      := nuguri.exe
-  REMOVE_CMD  := del
+  # termiWin 경로 (Makefile 기준 상대경로)
+  TERMIO_INC := termiWin-master/include
+  TERMIO_SRC := termiWin-master/src/termiWin.c
+
+  # termiWin 헤더를 찾도록 include 경로 추가
+  CFLAGS += -I$(TERMIO_INC)
+
+  # Windows용으로 SRC에 termiWin.c도 포함
+  SRC += $(TERMIO_SRC)
+
+  # 실행 파일 이름만 ".exe"로 붙이기 위해 TARGET 재정의
+  TARGET := nuguri.exe
+  REMOVE_CMD := del
 else ifeq ($(HOST_OS),macOS)
-  TARGET      := nuguri
-  REMOVE_CMD  := rm -f
+  # macOS 전용 설정
+  TARGET=nuguri
+  REMOVE_CMD := rm
 else ifeq ($(HOST_OS),Linux)
-  TARGET      := nuguri
-  REMOVE_CMD  := rm -f
+  # Linux 전용 설정
+  TARGET=nuguri
+  REMOVE_CMD := rm
 endif
 
 .PHONY: all clean clean_build
