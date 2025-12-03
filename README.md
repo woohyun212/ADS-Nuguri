@@ -72,7 +72,9 @@ feat: 이진 탐색 트리 구현
   if (condition)
   {
       // code
-  } else {
+  }
+  else
+  {
       // code
   }
   ```
