@@ -148,7 +148,6 @@ int main()
                 continue;
             }
             #else
-            c = getch();
             if (c == 'q')
             {
                 game_over = 1;
