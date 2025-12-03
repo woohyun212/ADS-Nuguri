@@ -16,7 +16,7 @@ else
 endif
 
 # 기본 컴파일/링크 옵션
-CFLAGS  := -std=c11 -Wall -Wextra
+CFLAGS  := -std=c99 -Wall -Wextra
 LDFLAGS :=
 
 ifeq ($(HOST_OS),Windows)
