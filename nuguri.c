@@ -1108,35 +1108,37 @@ void game_over(void)
     exit(0);
 }
 
+// 전체 화면을 지우고 커서를 0,0으로 이동
 void void_screen()
 {
-    // 전체 화면을 지우고 커서를 0,0으로 이동
     printf("\x1b[2J\x1b[H");
 }
 
+// 커서만 0,0 으로 이동
 void cls_screen(void)
 {
-    // 커서만 0,0 으로 이동
     printf("\x1b[H");
 }
 
+//커서 숨기기
 void hide_cursor(void)
 {
-    //커서 숨기기
     printf("\x1b[?25l");
 }
 
+//커서 보이기
 void show_cursor(void)
 {
-    //커서 숨기기
     printf("\x1b[?25h");
 }
 
+// 비프음 발생
 void beep()
 {
-    printf("\a"); // 비프음 발생
+    printf("\a"); 
 }
 
+//지정된 시간 동안 대기
 void delay(int ms)
 {
     #ifdef _WIN32
