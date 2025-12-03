@@ -608,12 +608,35 @@ void move_player(char input)
         player_y += 2;
         check_coin(player_x, player_y);
     }
+    // 사다리 이동 처리 (점프 중이 아닐 때만 고정)
+    // (!is_jumping) 조건을 추가하여 점프 중일 때는 사다리 로직 무시
+    // 'else if'를 사용하여 위의 특수 하강과 중복 실행 방지
+    else if (on_ladder && !is_jumping)
+    {
+        velocity_y = 0; // 중력 무시
+        if (input == 'w')
+        {
+            if (player_y - 1 >= 0 && st->rows[player_y - 1][player_x] != '#')
+            {
+                player_y--;
+                check_coin(player_x, player_y);
+            }
+        }
+        else if (input == 's')
+        {
+            if (player_y + 1 < st->height && st->rows[player_y + 1][player_x] != '#')
+            {
+                player_y++;
+                check_coin(player_x, player_y);
+            }
+        }
+    }
 
     // 사다리 판정 갱신
     on_ladder = (current_tile == 'H');
 
     // 사다리 끝(위가 '#')에서 점프 시 천장 위로 올라감.
-    if (input == ' ' && !is_jumping) 
+    if (input == ' ' && !is_jumping)
     {
         int climbed = 0;
         if (on_ladder && player_y > 0 && st->rows[player_y - 1][player_x] == '#')
@@ -631,87 +654,66 @@ void move_player(char input)
         }
 
         // 사다리에 붙어 있거나 바닥 위면 점프. 단, 방금 천장 위로 올라섰을 때는 점프 생략.
-        if (!climbed && (floor_tile == '#' || on_ladder)) 
+        if (!climbed && (floor_tile == '#' || on_ladder))
         {
             is_jumping = 1;
             velocity_y = -2;
         }
     }
 
-    // 사다리 이동 처리 (점프 중이 아닐 때만 고정)
-    // (!is_jumping) 조건을 추가하여 점프 중일 때는 사다리 로직 무시
-    if (on_ladder && !is_jumping)
+    // 점프 중이 아니거나 사다리에 있을 경우, 물리 로직을 건너뜁니다.
+    // 'else' 블록은 제거되어 점프/중력 로직이 사다리 이동과 독립적으로 처리됩니다.
+    // if (!on_ladder || is_jumping) 와 유사한 조건으로 아래 로직이 실행됩니다.
+    
+    // 지상/공중 물리 처리 (중력 및 점프)
+    
+    // 걷다가 낭떠러지로 떨어진 경우 (점프도 아니고 사다리도 아님)
+    if (!is_jumping && floor_tile == ' ' && !on_ladder)
     {
-        velocity_y = 0; // 중력 무시
-        if (input == 'w') 
-        {
-            if (player_y - 1 >= 0 && st->rows[player_y - 1][player_x] != '#')
-            {
-                player_y--;
-                check_coin(player_x, player_y);
-            }
-        }
-        else if (input == 's')
-        {
-            if (player_y + 1 < st->height && st->rows[player_y + 1][player_x] != '#')
-            {
-                player_y++;
-                check_coin(player_x, player_y);
-            }
-        }
+        is_jumping = 1;
+        velocity_y = 1; // 낙하 시작
     }
-    else 
+
+    if (is_jumping)
     {
-        // 지상/공중 물리 처리 (중력 및 점프)
-        
-        // 걷다가 낭떠러지로 떨어진 경우 (점프도 아니고 사다리도 아님)
-        if (!is_jumping && floor_tile == ' ' && !on_ladder)
+        int steps = abs(velocity_y);
+        int dir = (velocity_y > 0) ? 1 : -1;
+
+        for (int i = 0; i < steps; i++)
         {
-            is_jumping = 1;
-            velocity_y = 1; // 낙하 시작
+            int test_y = player_y + dir;
+
+            // 맵 범위 체크
+            if (test_y < 0 || test_y >= st->height)
+            {
+                if (test_y >= st->height) init_stage();
+                velocity_y = 0;
+                break;
+            }
+
+            char target_cell = st->rows[test_y][player_x];
+
+            // 벽 충돌 체크
+            if (target_cell == '#')
+            {
+                velocity_y = 0;
+                if (dir == 1) // 바닥 착지
+                {
+                    is_jumping = 0;
+                }
+                break;
+            }
+            
+            // 이동 확정
+            player_y = test_y;
+            check_coin(player_x, player_y);
         }
 
+        // 중력 적용
         if (is_jumping)
         {
-            int steps = abs(velocity_y); 
-            int dir = (velocity_y > 0) ? 1 : -1; 
-
-            for (int i = 0; i < steps; i++)
-            {
-                int test_y = player_y + dir;
-
-                // 맵 범위 체크
-                if (test_y < 0 || test_y >= st->height)
-                {
-                    if (test_y >= st->height) init_stage();
-                    velocity_y = 0;
-                    break;
-                }
-
-                char target_cell = st->rows[test_y][player_x];
-
-                // 벽 충돌 체크
-                if (target_cell == '#')
-                {
-                    velocity_y = 0;
-                    if (dir == 1) // 바닥 착지
-                    {
-                        is_jumping = 0;
-                    }
-                    break; 
-                }
-                
-                // 이동 확정
-                player_y = test_y;
-                check_coin(player_x, player_y);
-            }
-
-            // 중력 적용
-            if (is_jumping) 
-            {
-                velocity_y++;
-                if(velocity_y > 3) velocity_y = 3;
-            }
+            velocity_y++;
+            if(velocity_y > 3) velocity_y = 3;
         }
     }
 
