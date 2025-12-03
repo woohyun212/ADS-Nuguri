@@ -70,18 +70,15 @@ gcc -std=c99 -Wall -o nuguri nuguri.c
 
 ```bash
 # 빌드
-make          # HOST_OS=Linux 인 경우 TARGET=MAKEPIC 으로 설정됨
+make          # HOST_OS=Linux 인 경우 TARGET=nuguri 으로 설정됨
 
 # 실행
-./MAKEPIC     # 또는 Makefile에 설정된 TARGET 이름
+./nuguri     # 또는 Makefile에 설정된 TARGET 이름
 
 # 정리 및 재빌드
 make clean
 make          # 또는 make clean_build
 ```
-
-> 실제 제출/실행 시에는 `TARGET` 이름을 `nuguri`으로 맞추거나,  
-> README에 명시된 실행 파일 이름을 기준으로 조정하면 된다.
 
 ---
 
@@ -102,6 +99,7 @@ gcc -std=c99 -Wall -o nuguri nuguri.c
 make         # HOST_OS=macOS 로 인식됨
 ./nuguri   # 또는 Makefile에서 지정한 TARGET
 
+# 정리 및 재빌드
 make clean
 make         # 또는 make clean_build
 ```
