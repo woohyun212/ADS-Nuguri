@@ -129,9 +129,12 @@ make         # 또는 make clean_build
 
 <!-- 게임 스크린샷 캡쳐하여 추가-->
 
-|오프닝|플레이|게임 클리어|게임 오버|
-|-|-|-|-|
-|[이미지]|[이미지]|[이미지]|[이미지]|
+|빌드 & 오프닝|플레이|
+|:-:|:-:|
+|![build&opening](https://github.com/user-attachments/assets/6b4c8e07-b2e7-4771-ae9b-b4062293854f)|![gameplay](https://github.com/user-attachments/assets/3c5b8624-e6e3-494f-ac12-bde35c42c3f8)|
+|게임 클리어|게임 오버|
+|![ending](https://github.com/user-attachments/assets/d0a58e27-925c-4c0b-b116-340a6bf2e802)|![gameover](https://github.com/user-attachments/assets/5ee5213d-4679-4b6e-9118-d29953f99c67)|
+
 
 ---
 
