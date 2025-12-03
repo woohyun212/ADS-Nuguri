@@ -55,6 +55,9 @@ Coin* coins = NULL; // 가변 길이 코인 배열
 int coin_count = 0;
 int coin_capacity = 0; // 현재 할당된 코인 배열 크기
 
+// 적 이동 속도 제어
+int enemy_move_timer = 0;
+
 // 화면 버퍼 (스테이지 크기 변경 시에만 재할당)
 char** display_rows = NULL;
 char* display_buffer = NULL;
@@ -719,6 +722,14 @@ void move_player(char input)
 // 적 이동 로직
 void move_enemies()
 {
+    enemy_move_timer++;
+    if (enemy_move_timer < 3) { // 3 프레임당 1번 움직임
+        return;
+    }
+    else{
+        enemy_move_timer = 0;
+    }
+
     Stage* st = &stages[stage]; // 동적 폭/높이를 사용해 AI 경계 체크
     for (int i = 0; i < enemy_count; i++)
     {
