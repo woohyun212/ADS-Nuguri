@@ -138,6 +138,9 @@ int main()
                 case 75: c = 'a'; // Left
                     break;
                 }
+            }else if(c == 'q'){
+                game_over = 1;
+                continue;
             }
             #else
             c = getch();
