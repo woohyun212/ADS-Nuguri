@@ -135,6 +135,55 @@ make         # 또는 make clean_build
 |게임 클리어|게임 오버|
 |![ending](https://github.com/user-attachments/assets/d0a58e27-925c-4c0b-b116-340a6bf2e802)|![gameover](https://github.com/user-attachments/assets/5ee5213d-4679-4b6e-9118-d29953f99c67)|
 
+---
+
+## OS 호환성 문제 및 해결 과정
+
+### 1) Windows에서 빌드/실행 불가(헤더, API 차이)
+- 문제: 기존 코드는 `<unistd.h>`, `<termios.h>`, `<fcntl.h>` 및 `tcsetattr/tcgetattr`, `usleep` 등에 의존하여 Windows 환경에서 컴파일이 되지 않음.
+- 원인: 터미널 제어(termios)와 POSIX 계열 API는 Windows 기본 콘솔 환경과 호환되지 않음.
+- 해결: `#ifdef _WIN32` 조건부 컴파일을 도입하여 OS별로 필요한 헤더와 구현을 분리함.
+  - Windows: `<windows.h>`, `<conio.h>` 사용
+  - Linux/macOS: `<unistd.h>`, `<termios.h>`, `<fcntl.h>` 유지
+
+### 2) 키보드 입력 처리 방식의 OS 차이
+- 문제: OS에 따라 키 입력이 버퍼링되거나, 비동기 입력 감지가 달라 게임 조작이 원활하지 않음.
+- 원인:
+  - Linux/macOS: 기본 입력이 'canonical mode'로 raw 모드 전환이 필요
+  - Windows: termios 방식이 없고, 대신 콘솔 입력 API(conio) 사용 필요
+- 해결:
+  - Linux/macOS에서만 `enable_raw_mode()/disable_raw_mode()`를 사용해 ICANON/ECHO를 비활성화
+  - 비동기 입력 확인 함수 `kbhit()`를 OS별로 구현
+    - Windows: `_kbhit()` 사용
+    - Linux/macOS: `termios + fcntl(O_NONBLOCK) + getchar() + ungetc()` 방식으로 구현
+  - 입력 함수 `getch()`를 래핑하여 OS별 분기 처리
+    - Windows: `_getch()`
+    - Linux/macOS: `getchar()`
+
+
+### 3) 방향키 입력 인코딩 차이(Windows vs Unix 계열)
+- 문제: 방향키가 OS마다 다른 키 코드 값으로 입력되어 동일 로직으로 처리되지 않음
+- 원인:
+  - Windows: 방향키 입력이 `0xE0` 선 입력 후 (72/80/77/75) 값으로 입력
+  - Linux/macOS: escape sequence(`\x1b` + `[` + `A/B/C/D`)로 입력
+- 해결:
+  - OS별 파싱 로직을 분리해 방향키를 내부 공통 입력(`w/a/s/d`)으로 변환하여 게임 로직 상 동일하게 처리
+
+### 4) 지연 함수(Sleep/usleep) 차이
+- 문제: sleep 함수의 parameter 가 OS에 따라 단위가 달라 동일한 속도 제어가 어려움
+- 원인:
+  - Windows: `Sleep(ms)` (밀리초)
+  - Linux/macOS: `usleep(μs)` (마이크로초)
+- 해결: `delay(ms)` wrapper 함수를 만들어 OS별로 `Sleep(ms)` | `usleep(ms * 1000)`로 분기하여 코드 일관성 확보
+
+### 5) 터미널 제어(화면 지우기/커서 숨김) 호환성
+- 문제: 화면 갱신(클리어, 커서 이동/숨김)이 OS/터미널에 따라 표현이 달라 출력에 깜빡임, 잔상 등의 현상 발생
+- 원인: 화면 제어를 ANSI escape sequence(예: `\x1b[2J`, `\x1b[H`, `\x1b[?25l`)에 의존하며, 일부 Windows 콘솔은 설정/터미널 종류에 따라 지원이 제한됨
+- 해결:
+  - 화면 지우기/커서 제어를 함수로 분리(`void_screen`, `cls_screen`, `hide_cursor`, `show_cursor`)
+  - 프로그램 종료 시 상태 복구를 위해 `atexit(show_cursor)` 등을 등록하여 커서가 숨겨진 채로 남는 문제를 방지
+
+> 위 전처리기/래핑을 통해 입력 처리, delay, 터미널 제어 분기를 OS별로 분리하고, 게임 로직(update/draw)은 최대한 공통 코드로 유지하도록 설계 및 구현
 
 ---
 
