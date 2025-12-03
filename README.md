@@ -24,7 +24,7 @@ Project Repository : [https://github.com/woohyun212/ADS-Nuguri](https://github.c
 
 MinGW-w64 또는 유사한 gcc 환경에서:
 
-```bash
+```PowerShell
 gcc -std=c99 -Wall -o nuguri.exe nuguri.c
 nuguri.exe
 ```
