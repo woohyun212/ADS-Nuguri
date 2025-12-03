@@ -141,7 +141,9 @@ int main()
                 case 75: c = 'a'; // Left
                     break;
                 }
-            }else if(c == 'q'){
+            }
+            else if(c == 'q')
+            {
                 game_over = 1;
                 continue;
             }
@@ -721,10 +723,12 @@ void move_player(char input)
 void move_enemies()
 {
     enemy_move_timer++;
-    if (enemy_move_timer < 3) { // 3 프레임당 1번 움직임
+    if (enemy_move_timer < 3) // 3 프레임당 1번 움직임
+    { 
         return;
     }
-    else{
+    else
+    {
         enemy_move_timer = 0;
     }
 
@@ -1043,7 +1047,8 @@ void ending(void)
 
     // while 문으로 교체
     int i = 0;
-    while (1) {
+    while (1) 
+    {
         void_screen();  // 화면 클
         printf("%s\n", frames[count - 1]); // END
         printf("%s\n", frames[i]);    // 애니메이션 프레임
