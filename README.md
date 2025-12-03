@@ -1,5 +1,139 @@
+Project Repository : [https://github.com/woohyun212/ADS-Nuguri](https://github.com/woohyun212/ADS-Nuguri)
+---
+
 # ADS-Nuguri
 고급자료구조 팀과제
+
+---
+
+## 팀소개
+|<img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/4ebb2ffb-6c01-40dc-a3cc-64f9fad0d79c" />|<img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/fbbd67c2-97f8-4286-b09b-b312d1ec1f9a" />|<img width="100" height="100" alt="image" src="https://github.com/user-attachments/assets/666b4018-1b87-4b7b-8229-df4e29eb2cb2" />|
+|:-:|:-:|:-:|
+|박아정|박우현|이준서|
+|20243103|20213097|20223129|
+
+---
+
+## OS별 컴파일 및 실행 방법 가이드
+
+- gcc compiler 기준으로 안내한다.
+
+### 3.2 Windows (gcc / MinGW 기준)
+
+#### (1) 직접 컴파일
+
+MinGW-w64 또는 유사한 gcc 환경에서:
+
+```bash
+gcc -std=c99 -Wall -o nuguri.exe nuguri.c
+nuguri.exe
+```
+
+PowerShell 기준:
+
+```powershell
+gcc -std=c99 -Wall -o nuguri.exe nuguri.c
+.\nuguri.exe
+```
+
+#### (2) Makefile 사용
+
+```powershell
+# 빌드
+make          # 또는 mingw32-make 등 환경에 맞는 make 명령
+
+# 실행
+.\nuguri.exe
+
+# 정리 및 재빌드
+make clean
+make          # 또는 make clean_build
+```
+
+> `Makefile`에서 기본 `TARGET`은 `nuguri`으로 정의되어 있으며,  
+> Windows에서는 실행 시 `.exe` 확장자가 붙는다.
+
+---
+
+### 3.3 Linux
+
+#### (1) 직접 컴파일
+
+```bash
+gcc -std=c99 -Wall -o nuguri nuguri.c
+./nuguri
+```
+
+#### (2) Makefile 사용
+
+`Makefile`은 OS를 감지하여 Linux인 경우 별도의 타깃 이름을 사용하도록 설정되어 있다.
+
+```bash
+# 빌드
+make          # HOST_OS=Linux 인 경우 TARGET=MAKEPIC 으로 설정됨
+
+# 실행
+./MAKEPIC     # 또는 Makefile에 설정된 TARGET 이름
+
+# 정리 및 재빌드
+make clean
+make          # 또는 make clean_build
+```
+
+> 실제 제출/실행 시에는 `TARGET` 이름을 `nuguri`으로 맞추거나,  
+> README에 명시된 실행 파일 이름을 기준으로 조정하면 된다.
+
+---
+
+### 3.4 macOS
+
+#### (1) 직접 컴파일
+
+gcc가 설치 후
+
+```bash
+gcc -std=c99 -Wall -o nuguri nuguri.c
+./nuguri
+```
+
+#### (2) Makefile 사용
+
+```bash
+make         # HOST_OS=macOS 로 인식됨
+./nuguri   # 또는 Makefile에서 지정한 TARGET
+
+make clean
+make         # 또는 make clean_build
+```
+
+---
+
+## 구현 기능 리스트 및 게임 스크린샷
+
+### 구현 기능 리스트
+
+1. 동적 맵 로딩 및 적과 코인 등 Stage Object 자동 인식 기능 구현
+2. 스폰 위치 저장 및 리스폰 시스템 구현 (체력 및 점수 패널티 적용)
+3. 체력(하트 UI) 시스템 도입 및 게임오버 화면 연출 추가
+4. 코인 획득 판정 및 점수 반영 로직 개선 (효과음 추가)
+5. 화면 버퍼링을 통한 깜빡임 최소화 및 출력 최적화
+6. 적 이동 속도 제어를 통해 게임 난이도 조절 기능 추가
+7. 캐릭터 및 객체 색상 출력으로 시인성 강화
+8. 입력 처리 방식 개선 및 Crossplatform(Windows/Linux/macOS 환경) 지원
+9. 오프닝/엔딩 화면 및 커서 제어 등 UX 향상 요소 추가
+10. 동적으로 할당된 메모리 해제 루틴 구현으로 메모리 자원 관리 안정성 강화 
+
+---
+
+### 게임 스크린샷 
+
+<!-- 게임 스크린샷 캡쳐하여 추가-->
+
+|오프닝|플레이|게임 클리어|게임 오버|
+|-|-|-|-|
+|[이미지]|[이미지]|[이미지]|[이미지]|
+
+---
 
 ## 협업 가이드
 
