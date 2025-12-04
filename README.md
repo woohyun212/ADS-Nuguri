@@ -1,6 +1,6 @@
-Project Repository : [https://github.com/woohyun212/ADS-Nuguri](https://github.com/woohyun212/ADS-Nuguri)
-
-Slide : [Link](https://www.figma.com/deck/mmcRry8XoNioa2ufBSbR23/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C?node-id=1-30&t=VlvvWtRG63GqLLYr-1)
+Project Repository: [https://github.com/woohyun212/ADS-Nuguri](https://github.com/woohyun212/ADS-Nuguri)  
+Slide: [figma Link](https://www.figma.com/deck/mmcRry8XoNioa2ufBSbR23/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C?node-id=1-30&t=VlvvWtRG63GqLLYr-1)
+---
 
 # ADS-Nuguri
 고급자료구조 팀과제
