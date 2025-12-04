@@ -670,7 +670,7 @@ void move_player(char input)
     // 지상/공중 물리 처리 (중력 및 점프)
 
     // 걷다가 낭떠러지로 떨어진 경우 (점프도 아니고 사다리도 아님)
-    if (!is_jumping && floor_tile == ' ' && !on_ladder)
+    if (!is_jumping && (floor_tile == ' ' || floor_tile == 'C') && !on_ladder)
     {
         is_jumping = 1;
         velocity_y = 1; // 낙하 시작
