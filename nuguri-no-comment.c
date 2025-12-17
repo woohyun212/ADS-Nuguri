@@ -152,7 +152,7 @@ int main()
             }
             if (c == '\x1b')
             {
-                getch(); ['
+                getch();
                 switch (getch())
                 {
                 case 'A': c = 'w';
